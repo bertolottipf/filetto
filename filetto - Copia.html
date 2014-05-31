@@ -1,0 +1,442 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script-->
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>-->
+		<script type="text/javascript" src="jquery-1.7.2.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8.12.custom.min.js"></script>
+		<script type="text/javascript">
+			<!--//
+			
+			var unit = 'px';
+			var trueWidth = 400;
+			var trueHeight = trueWidth;
+			var seenWidth = trueWidth - 20;
+			var seenHeight = seenWidth;
+			
+			// inizia il gamer1
+			var gamer1 = true;
+			var gamer2 = (gamer1 == true ? false : true);
+			
+			var areAllPicesOnTable = false;
+			var piecesOnTableArr = new Array;
+			var piecesOutOfTableArr = new Array;
+			piecesOutOfTableArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+			
+			
+			/**
+			 * FUNZIONE ONLOAD
+			 * funzione attivata alla fine del caricamento della pagina
+			 */
+			$(function() {
+				
+				// immagazzino in txt i div per i posti per le pedine e 
+				//                    lo schema del gioco
+				var txt = makePlaces();
+				txt += makeSchema();
+				
+				// scrivo txt nel body
+				$('#schema').html(txt);
+				
+				// sistemo la posizione dei div per i posti per le pedine
+				placePlaces();
+				
+				// immagazzino in txt i div che rappresentano le pedine
+				txt = makePieces();
+				
+				// scrivo txt nel div per le pedine
+				$('#piecesAtStarting').html(txt);
+				
+				// do il drag&drop ai componenti
+				dragAndDrop();
+				
+				// blocco le padine giuste
+				lockUnlockPieces();
+			});
+			
+			
+			/**
+			 * SCHEMA SVG
+			 * crea lo schema svg
+			 */
+			function makeSchema() {
+				
+				var code;
+				code = '<svg width="' + trueWidth + unit + '" height="'+ trueHeight + unit + '" viewBox="0 0 ' + trueWidth + ' ' + trueHeight +'">\n';
+				
+				code += '<line x1="' + ((trueWidth - seenWidth) / 2) + '" y1="' + ((trueHeight - seenHeight) / 2) + '" x2="' + (trueWidth - ((trueWidth - seenWidth) / 2)) + '" y2="' + ((trueHeight - seenHeight)/2) + '" style="stroke: black;" id="line1"/>\n';
+				code += '<line x1="' + ((trueWidth - seenWidth) / 2) + '" y1="' + ((trueHeight - seenHeight) / 2) + '" x2="' + ((trueHeight - seenHeight) / 2) + '" y2="' + (trueHeight - ((trueHeight - seenHeight) / 2)) + '" style="stroke: black;" id="line2"/>\n';
+				code += '<line x1="' + ((trueWidth - seenWidth) / 2) + '" y1="' + (trueHeight - ((trueHeight - seenHeight) / 2)) + '" x2="' + (trueWidth - ((trueWidth - seenWidth) / 2)) + '" y2="' + (trueHeight - ((trueHeight - seenHeight) / 2)) + '" style="stroke: black;" id="line3"/>\n';
+				code += '<line x1="' + (trueWidth - ((trueWidth - seenWidth) / 2)) + '" y1="' + (trueHeight - ((trueHeight - seenHeight) / 2)) + '" x2="' + (trueWidth - ((trueWidth - seenWidth) / 2)) + '" y2="' + ((trueHeight - seenHeight) / 2) + '" style="stroke: black;" id="line4"/>\n';
+				
+				code += '<line x1="' + (seenWidth / 6) + '" y1="' + (seenHeight / 6) + '" x2="' + (trueWidth - (seenWidth / 6)) + '" y2="' + (seenHeight / 6) + '" style="stroke: black;" id="line5"/>\n';
+				code += '<line x1="' + (seenWidth / 6) + '" y1="' + (seenHeight / 6) + '" x2="' + (seenWidth / 6) + '" y2="' + (trueHeight - (seenHeight / 6)) + '" style="stroke: black;" id="line6"/>\n';
+				code += '<line x1="' + (seenWidth / 6) + '" y1="' + (trueHeight - (seenHeight / 6)) + '" x2="' + (trueWidth - (seenWidth / 6)) + '" y2="' + (trueHeight - (seenHeight / 6)) + '" style="stroke: black;" id="line7"/>\n';
+				code += '<line x1="' + (trueWidth - (seenWidth / 6)) + '" y1="' + (trueHeight - (seenHeight / 6)) + '" x2="' + (trueWidth - (seenWidth / 6)) + '" y2="' + (seenHeight / 6) + '" style="stroke: black;" id="line8"/>\n';
+				
+				code += '<line x1="' + (seenWidth / 3.26) + '" y1="' + (seenHeight / 3.26) + '" x2="' + (trueWidth - (seenWidth / 3.26)) + '" y2="' + (seenHeight / 3.26) + '" style="stroke: black;" id="line9"/>\n';
+				code += '<line x1="' + (seenWidth / 3.26) + '" y1="' + (seenHeight / 3.26) + '" x2="' + (seenWidth / 3.26) + '" y2="' + (trueHeight - (seenHeight / 3.26)) + '" style="stroke: black;" id="line10"/>\n';
+				code += '<line x1="' + (seenWidth / 3.26) + '" y1="' + (trueHeight - (seenHeight / 3.26)) + '" x2="' + (trueWidth - (seenWidth / 3.26)) + '" y2="' + (trueHeight - (seenHeight / 3.26)) + '" style="stroke: black;" id="line11"/>\n';
+				code += '<line x1="' + (trueWidth - (seenWidth / 3.26)) + '" y1="' + (trueHeight - (seenHeight / 3.26)) + '" x2="' + (trueWidth - (seenWidth / 3.26)) + '" y2="' + (seenHeight / 3.26) + '" style="stroke: black;" id="line12"/>\n';
+				
+				code += '<line x1="' + (trueWidth / 2) + '" y1="' + ((trueWidth - seenWidth) / 2) + '" x2="' + (trueWidth / 2) + '" y2="' + (seenHeight / 3.26) + '" style="stroke: black;" id="line13"/>\n';
+				code += '<line x1="' + ((trueWidth - seenWidth) / 2) + '" y1="' + (trueHeight / 2) + '" x2="' + (seenWidth / 3.26) + '" y2="' + (trueHeight / 2) + '" style="stroke: black;" id="line14"/>\n';
+				code += '<line x1="' + (trueWidth / 2) + '" y1="' + (trueHeight - ((trueHeight - seenHeight) / 2)) + '" x2="' + (trueWidth / 2) + '" y2="' + (trueHeight - (seenHeight / 3.26)) + '" style="stroke: black;" id="line15"/>\n';
+				code += '<line x1="' + (trueWidth - ((trueWidth - seenWidth) / 2)) + '" y1="' + (trueHeight / 2) + '" x2="' + (trueWidth - (seenWidth / 3.26)) + '" y2="' + (trueHeight / 2) + '" style="stroke: black;" id="line16"/>\n';
+				
+				code += '<text x="' + (seenWidth / 12) + '" y="' + (trueHeight / 10) + '" style="font-family: sans-serif; font-size: 10pt; stroke: none; fill: black;">Lingotto v. 0.1</text>\n';
+				code += '<text x="' + (trueWidth / 2 + 3) + '" y="' + (seenHeight / 4) + '" style="font-family: sans-serif; font-size: 10pt; stroke: none; fill: black;">by BERTOLOTTI P. F.</text>\n';
+				code += '<a xlink:href="http://www.bertolottipf.it"><text x="' + (seenWidth / 2.8) + '" y="' + (trueHeight / 2 +3) + '" style="font-family: sans-serif; font-size: 10pt; stroke: none; fill: blue; text-decoration: underline;">http://www.bertolottipf.it</text></a>\n';
+				
+				code += '</svg>\n';
+				
+				return code;
+			}
+			
+			
+			/**
+			 * SCHEMA DIV
+			 * schema div con html
+			 */
+			function makePlaces() {
+				
+				var code;
+				
+				code = '<div class="cell" id="cell00">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell01">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell02">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell03">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell04">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell05">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell06">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell07">&nbsp;</div>\n';
+				
+				code += '<div class="cell" id="cell10">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell11">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell12">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell13">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell14">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell15">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell16">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell17">&nbsp;</div>\n';
+				
+				code += '<div class="cell" id="cell20">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell21">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell22">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell23">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell24">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell25">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell26">&nbsp;</div>\n';
+				code += '<div class="cell" id="cell27">&nbsp;</div>\n';
+				
+				return code;
+			}
+			
+			
+			/**
+			 * PIAZZA LE CELLE
+			 * sistema i posti ove sarà possibile posizionare le pedine
+			 */
+			function placePlaces() {
+				$('#cell00').css( 'top', (((trueHeight - seenHeight) / 2) + 28) );
+				$('#cell00').css( 'left', (((trueWidth - seenWidth) / 2) - 2) );
+				
+				$('#cell10').css( 'top', ((seenHeight / 6) + 28) );
+				$('#cell10').css( 'left', ((seenWidth / 6) - 2) );
+				
+				$('#cell20').css( 'top', ((seenHeight / 3.26) + 28) );
+				$('#cell20').css( 'left', ((seenWidth / 3.26) - 2) );
+				
+				$('#cell01').css( 'top', (((trueHeight - seenHeight) / 2) + 28) );
+				$('#cell01').css( 'left', ((trueWidth / 2) - 2) );
+				
+				$('#cell11').css( 'top', ((seenHeight / 6) + 28) );
+				$('#cell11').css( 'left', ((trueWidth / 2) - 2) );
+				
+				$('#cell21').css( 'top', ((seenHeight / 3.26) + 28) );
+				$('#cell21').css( 'left', ((trueWidth / 2) - 2) );
+				
+				$('#cell02').css( 'top', (((trueHeight - seenHeight) / 2) + 28) );
+				$('#cell02').css( 'left', ((trueWidth - ((trueWidth - seenWidth) / 2)) - 2) );
+				
+				$('#cell12').css( 'top', ((seenHeight / 6) + 28) );
+				$('#cell12').css( 'left', ((trueWidth - (seenWidth / 6)) - 2) );
+				
+				$('#cell22').css( 'top', ((seenHeight / 3.26) + 28) );
+				$('#cell22').css( 'left', ((trueWidth - (seenWidth / 3.26)) - 2) );
+				
+				$('#cell03').css( 'top', ((trueHeight / 2) + 28) );
+				$('#cell03').css( 'left', ((trueWidth - ((trueWidth - seenWidth) / 2)) - 2) );
+				
+				$('#cell13').css( 'top', ((trueHeight / 2) + 28) );
+				$('#cell13').css( 'left', ((trueWidth - (seenWidth / 6)) - 2) );
+				
+				$('#cell23').css( 'top', ((trueHeight / 2) + 28) );
+				$('#cell23').css( 'left', ((trueWidth - (seenWidth / 3.26)) - 2) );
+				
+				$('#cell04').css( 'top', ((trueHeight - ((trueHeight - seenHeight) / 2)) + 28) );
+				$('#cell04').css( 'left', ((trueWidth - ((trueWidth - seenWidth) / 2)) - 2) );
+				
+				$('#cell14').css( 'top', ((trueHeight - (seenHeight / 6)) + 28) );
+				$('#cell14').css( 'left', ((trueWidth - (seenWidth / 6)) - 2) );
+				
+				$('#cell24').css( 'top', ((trueHeight - (seenHeight / 3.26)) + 28) );
+				$('#cell24').css( 'left', ((trueWidth - (seenWidth / 3.26)) - 2) );
+				
+				$('#cell05').css( 'top', ((trueHeight - ((trueHeight - seenHeight) / 2)) + 28) );
+				$('#cell05').css( 'left', ((trueWidth / 2) - 2) );
+				
+				$('#cell15').css( 'top', ((trueHeight - (seenHeight / 6)) + 28) );
+				$('#cell15').css( 'left', ((trueWidth / 2) - 2) );
+				
+				$('#cell25').css( 'top', ((trueHeight - (seenHeight / 3.26)) + 28) );
+				$('#cell25').css( 'left', ((trueWidth / 2) - 2) );
+				
+				$('#cell06').css( 'top', ((trueHeight - ((trueHeight - seenHeight) / 2)) + 28) );
+				$('#cell06').css( 'left', (((trueWidth - seenWidth) / 2) - 2) );
+				
+				$('#cell16').css( 'top', ((trueHeight - (seenHeight / 6)) + 28) );
+				$('#cell16').css( 'left', ((seenWidth / 6) - 2) );
+				
+				$('#cell26').css( 'top', ((trueHeight - (seenHeight / 3.26)) + 28) );
+				$('#cell26').css( 'left', ((seenWidth / 3.26) -2) );
+				
+				$('#cell07').css( 'top', ((trueHeight / 2) + 28) );
+				$('#cell07').css( 'left', (((trueWidth - seenWidth) / 2) - 2) );
+				
+				$('#cell17').css( 'top', ((trueHeight / 2) + 28) );
+				$('#cell17').css( 'left', ((seenWidth / 6) - 2) );
+				
+				$('#cell27').css( 'top', ((trueHeight / 2) + 28) );
+				$('#cell27').css( 'left', ((seenWidth / 3.26) -2) );
+				
+			}
+			
+			
+			/**
+			 * CREA PEDINE
+			 * crea tutte le pedine che si potranno usare
+			 */
+			function makePieces() {
+				var code = "";
+				var i = 0;
+				
+				for (i = 0; i < 18; i++) {
+					code += '<div id="piece' + i + '" class="piece drag ';
+					if (i < 9) {
+						code += 'gamer1';
+					} else {
+						code += 'gamer2';
+					}
+					code += '">&nbsp;</div>\n';
+				}
+				
+				return code;
+			}
+			
+			
+			/**
+			 * DRAG AND DROP
+			 */
+			function dragAndDrop() {
+				$('.cell').droppable({
+					hoverClass: 'hover',
+					tolerance: 'intersect',
+					drop: function(event, ui){
+						
+						// prendo l'id della pedina (pieceN)
+						var idPedina = ui.draggable.attr('id');
+						
+						// prendo il numero e rendo il tutto un numero
+						var nIdPedina = parseInt(idPedina.substr(5));
+						
+						if (areAllPicesOnTable == false) {
+						
+							// tolgo la padina tra quelle sul tavolo
+							piecesOutOfTable(nnIdPedina);
+							console.log(piecesOutOfTableArr);
+							
+							// inserisco la pedina tra quelle sul tavolo
+							piecesOnTable(nnIdPedina);
+							console.log(piecesOnTableArr);
+						}
+						
+						// elimino l'accessibilità della cella
+						$(this).droppable('disable');
+						
+						// cambio il giocatore
+						changeGamer();
+						
+						// blocco e blocco le pedine dell'avversario
+						lockUnlockPieces();
+						
+						if (areAllPicesOnTable == false) {
+							// blocco le pedine sul tavolo
+							lockPiecesOnTable();
+						}
+					}
+				});
+				
+				$('.drag').draggable({revert: 'invalid'});
+				
+			}
+			
+			
+			
+			/**
+			 * TRACCIA PEDINE SUL TAVOLO
+			 * tiene traccia delle pedine sul tavolo
+			 * 
+			 * var piece è un numero da 0 a 17
+			 */
+			function piecesOnTable(piece) {
+				piecesOnTableArr.push(piece);
+			}
+			
+			
+			/**
+			 * TRACCIA PEDINE FUORI TAVOLO
+			 * tiene traccia delle pedine fuori dal tavolo
+			 * 
+			 * var piece è un numero da 0 a 17
+			 */
+			function piecesOutOfTable(piece) {
+				piecesOutOfTableArr[piece] = null;
+			}
+			
+			
+			/**
+			 * BLOCCA PEDINE SUL TAVOLO
+			 * blocca le pedine sul tavolo fino a che 
+			 * l'array piecesOutOfTable[] sia vuoto
+			 */
+			function lockPiecesOnTable() {
+				var toBlock = false;
+				
+				// controllo se ci sono elementi nell'array piecesOutOfTable
+				for (indice in piecesOutOfTableArr) {
+					
+					// e se ce n'è anche solo uno
+					if (piecesOutOfTableArr[indice] != null) {
+						
+						// dichiaro che le pedine sul tavolo sono da bloccare
+						toBlock = true;
+						break;
+					
+					} else {
+					
+						toBlock = false;
+						console.log("imposto!!!!");
+						areAllPicesOnTable = true;
+					
+					}
+				}
+				
+				// se sono da bloccare le pedine sul tavolo
+				if (toBlock == true) {
+					
+					// per tutte le pedine nell'array piecesOnTable
+					for (indice in piecesOnTableArr) {
+						
+						// faccio il blocco
+						$('#piece' + piecesOnTableArr[indice]).draggable("disable");
+					}
+				}
+			}
+			
+			
+			/**
+			 * CAMBIA GIOCATORE
+			 * cambia solo lo stato dei gioccatori e
+			 * chiama la funzion lockUnlockPieces()
+			 */
+			function changeGamer() {
+				gamer1 = (gamer1 == true ? false : true);
+				gamer2 = (gamer1 == true ? false : true);
+			}
+			
+			
+			/**
+			 * BLOCCA SBLOCCA PEDINE
+			 * sblocca le padine del giocatore corrente e sblocca le altre
+			 */
+			function lockUnlockPieces() {
+				if (gamer1 == true) {
+					$(".gamer2").draggable("disable");
+					$(".gamer1").draggable("enable");
+				} else {
+					$(".gamer1").draggable("disable");
+					$(".gamer2").draggable("enable");
+				}
+			}
+			
+			
+			//-->
+		</script>
+		
+		<style type="text/css">
+			div.cell {
+				//background-color: red;
+				width: 20px;
+				hight: 20px;
+				position: absolute;
+			}
+			
+			.drag {
+				cursor: crosshair;
+			}
+			
+			.gamer1 {}
+			
+			.gamer2 {}
+			
+			.hover {
+				background-color: #00FF00;
+				opacity:0.6;
+			}
+			
+			.piece {
+				float: left;
+				
+				margin-left: 2px;
+				z-index: 10;
+				width : 20px;
+				height : 20px;
+				background : orange;
+				-moz-border-radius : 10px;
+				-webkit-border-radius : 10px;
+				border-radius : 10px;
+			}
+			
+			#piece0,  #piece1, #piece2, #piece3, #piece4, #piece5, #piece6, #piece7, #piece8 {
+				border: 1px solid black;
+				background-color: white;
+			}
+			
+			#piece9,  #piece10, #piece11, #piece12, #piece13, #piece14, #piece15, #piece16, #piece17 {
+				border: 1px solid white;
+				background-color: black;
+			}
+			
+			#piecesAtStarting {
+				height: 22px;
+				top: 0px;
+				left: 0px;
+				width: 100%;
+				position: absolute;
+				//background-color: blue;
+				border-bottom: 1px dotted black;
+			}
+			
+			#schema {
+				margin-top: 40px
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<div id="piecesAtStarting"></div>
+		<div id="schema"></div>
+	</body>
+</html>

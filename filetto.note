@@ -1,0 +1,37 @@
+ 10 -> ' + ((trueWidth - seenWidth) / 2) + '
+       ' + ((trueHeight - seenHeight) / 2) + '
+
+490 -> ' + (trueWidth - ((trueWidth - seenWidth) / 2)) + '
+       ' + (trueHeight - ((trueHeight - seenHeight) / 2)) + '
+
+ 80 -> ' + (seenWidth / 6) + '
+       ' + (seenHeight / 6) + '
+
+420 -> ' + (trueWidth - (seenWidth / 6)) + '
+       ' + (trueHeight - (seenHeight / 6)) + '
+
+150 -> ' + (seenWidth / 3.26) + '
+       ' + (seenHeight / 3.26) + '
+
+350 -> ' + (trueWidth - (seenWidth / 3.26)) + '
+       ' + (trueHeight - (seenHeight / 3.26)) + '
+
+250 -> ' + (trueWidth / 2) + '
+       ' + (trueHeight / 2) + '
+
+
+pedina: piece
+
+
+Il vero nome è FILETTO
+
+Si gioca con 9 pedine l'uno, e si pongono a turno una alla volta nei punti 
+di intersezione in modo da fare tris o in verticale o in orizzontale, fino  
+a esaurimento pedine.
+Non appena si finisce di porre le pedine, le si può solo spostare in linea retta
+da un'intersezione all'altra ma anche da un angolo all'altro a patto che non si 
+saltino le pedine (proprie o avversarie) e che si muova in linea retta.
+Quando si fa tris si può togliere una pedina avversaria a piacere dal campo.
+quando si rimane a tre pedine, si ha la facoltà di saltare le pedine e angoli (si piò mettere ovunque).
+Vince chi toglie 7 pedine all'avversario.
+
